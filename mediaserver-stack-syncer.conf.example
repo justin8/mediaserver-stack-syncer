@@ -1,0 +1,17 @@
+global:
+    permissions: 0644
+    remote_host: foo.bar.com
+    remote_port: 1234
+    remote_user: justin
+
+libraries:
+    - type: tv
+      permissions: 0644
+      local_path: /Users/justin/scratch/mediaserver-stack-syncer-test/tv
+      remote_path: /home/justin/scratch/tv
+      remote_host: some.other.host.com
+      remote_user: justin
+
+    - type: movies
+      local_path: /Users/justin/scratch/mediaserver-stack-syncer-test/movies
+      remote_path: /home/justin/scratch/movies

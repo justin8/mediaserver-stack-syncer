@@ -1,0 +1,9 @@
+[Unit]
+Description=Timer to sync a remote mediaserver-stack
+
+[Timer]
+OnCalendar=*:0/5:0
+Persistent=True
+
+[Install]
+WantedBy=timers.target

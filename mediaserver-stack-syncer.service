@@ -1,0 +1,9 @@
+[Unit]
+Description=Script to pull library updates from a remote mediaserver-stack instance
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=__SCRIPT__
+User=__USER__
+Group=__GROUP__
