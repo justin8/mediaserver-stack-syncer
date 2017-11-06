@@ -252,7 +252,8 @@ def push_tv(library):
     subprocess.check_output(command)
 
 
-def purge_remote(library):
+def purge_remote_library(library):
+    print("Purging remote library...")
     ssh_conn = ssh_connection(library)
     ssh_conn.exec_command("rm -rf {}/*".format(library["remote_path"]))
 
@@ -274,6 +275,7 @@ def start_sync(verbose, push_only, purge_remote):
 
     for library in read_config():
         if purge_remote:
+            purge_remote_library(library)
         if library["type"] == TV:
             log.info("Found TV library: {}".format(library))
             if push_only or pull_media(library):
