@@ -27,6 +27,7 @@ VALID_TYPES = [MOVIES, TV]
 
 global_config = {}
 
+
 def set_log_level(verbose):
     log_level = logging.ERROR
     if verbose == 1:
@@ -110,6 +111,7 @@ def validate_config(config, library_validation=True):
 def validate_port(port):
     assert(type(port) == int)
 
+
 def pull_media(library):
     print("Pulling library ({})".format(get_value(library, "local_path")))
     ssh = ssh_connection(library)
@@ -127,6 +129,7 @@ def pull_media(library):
             sftp.remove(str(remote_source_file))
     return new_files
 
+
 def pull_file(library, relative_path):
     port = get_value(library, "remote_port")
     user = get_value(library, "remote_user")
@@ -141,7 +144,6 @@ def pull_file(library, relative_path):
     command = ["rsync", "-asqe", "ssh -p {}".format(port), source, destination]
     log.debug("Pulling file with command: {}".format(command))
     subprocess.check_output(command)
-
 
 
 def find_new_files(library, ssh_conn):
@@ -250,10 +252,16 @@ def push_tv(library):
     subprocess.check_output(command)
 
 
+def purge_remote(library):
+    ssh_conn = ssh_connection(library)
+    ssh_conn.exec_command("rm -rf {}/*".format(library["remote_path"]))
+
+
 @click.command()
 @click.option("-v", "--verbose", count=True, help="Enable more logging. More -v's for more logging")
-@click.option("--push-only", default=False, help="Do not pull changes, only generate fake libraries and push them")
-def start_sync(verbose, push_only):
+@click.option("--push-only", is_flag=True, default=False, help="Do not pull changes, only generate fake libraries and push them")
+@click.option("--purge-remote", is_flag=True, default=False, help="Delete all files on the remote host first")
+def start_sync(verbose, push_only, purge_remote):
     set_log_level(verbose)
 
     try:
@@ -265,6 +273,8 @@ def start_sync(verbose, push_only):
         sys.exit(1)
 
     for library in read_config():
+        if purge_remote:
+            purge_remote(library)
         if library["type"] == TV:
             log.info("Found TV library: {}".format(library))
             if push_only:
