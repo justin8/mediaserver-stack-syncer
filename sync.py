@@ -274,16 +274,11 @@ def start_sync(verbose, push_only, purge_remote):
 
     for library in read_config():
         if purge_remote:
-            purge_remote(library)
         if library["type"] == TV:
             log.info("Found TV library: {}".format(library))
-            if push_only:
+            if push_only or pull_media(library):
                 create_fake_library(library)
                 push_tv(library)
-            else:
-                if pull_media(library):
-                    create_fake_library(library)
-                    push_tv(library)
         if library["type"] == MOVIES:
             log.info("Found Movie library: {}".format(library))
             if not push_only:
