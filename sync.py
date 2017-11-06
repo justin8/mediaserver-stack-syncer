@@ -258,11 +258,17 @@ def purge_remote_library(library):
     ssh_conn.exec_command("rm -rf {}/*".format(library["remote_path"]))
 
 
+def purge_cache(library):
+    fake_library = fake_library_path(library)
+    shutil.rmtree(fake_library, ignore_errors=True)
+
+
 @click.command()
 @click.option("-v", "--verbose", count=True, help="Enable more logging. More -v's for more logging")
 @click.option("--push-only", is_flag=True, default=False, help="Do not pull changes, only generate fake libraries and push them")
 @click.option("--purge-remote", is_flag=True, default=False, help="Delete all files on the remote host first")
-def start_sync(verbose, push_only, purge_remote):
+@click.option("--purge-local-cache", is_flag=True, default=False, help="Delete the local library cache")
+def start_sync(verbose, push_only, purge_remote, purge_local_cache):
     set_log_level(verbose)
 
     try:
@@ -276,6 +282,8 @@ def start_sync(verbose, push_only, purge_remote):
     for library in read_config():
         if purge_remote:
             purge_remote_library(library)
+        if purge_local_cache:
+            purge_cache(library)
         if library["type"] == TV:
             log.info("Found TV library: {}".format(library))
             if push_only or pull_media(library):
